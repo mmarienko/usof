@@ -33,7 +33,7 @@ class CreateUserVerificationsTable extends Migration
         Schema::dropIfExists('user_verifications');
 
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('remember_token');
+            $table->dropColumn('email_verified_at');
         });
     }
 }

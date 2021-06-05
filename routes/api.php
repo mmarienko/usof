@@ -25,3 +25,12 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::middleware('jwt.auth')->post('password-reset', 'AuthController@reset');
     Route::middleware('jwt.auth')->post('refresh', 'AuthController@refresh');
 });
+
+
+Route::group([], function() {
+    Route::get('posts', 'PostController@index');
+    Route::get('posts/{post}', 'PostController@show');
+    Route::middleware('jwt.auth')->post('posts', 'PostController@store');
+    Route::middleware('jwt.auth')->patch('posts/{post}', 'PostController@update');
+    Route::middleware('jwt.auth')->delete('posts/{post}', 'PostController@delete');
+});
