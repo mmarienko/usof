@@ -13,6 +13,15 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => 'auth'], function ($router) {
+    Route::post('login', 'AuthController@login');
+    Route::post('register', 'AuthController@register');
+
+    Route::get('verify/{verification_code}', 'AuthController@verify');
+    Route::post('password-reset/{recovery_code}', 'AuthController@recover');
+
+    Route::middleware('jwt.auth')->post('logout', 'AuthController@logout');
+    Route::middleware('jwt.auth')->post('me', 'AuthController@me');
+    Route::middleware('jwt.auth')->post('password-reset', 'AuthController@reset');
+    Route::middleware('jwt.auth')->post('refresh', 'AuthController@refresh');
 });
