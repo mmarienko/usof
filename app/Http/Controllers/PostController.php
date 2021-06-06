@@ -16,9 +16,9 @@ class PostController extends Controller
         return Post::all();
     }
 
-    public function show(Post $post)
+    public function show(Post $post_id)
     {
-        return $post;
+        return $post_id;
     }
 
     public function store(Request $request)
@@ -52,7 +52,7 @@ class PostController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    public function update(Request $request, Post $post)
+    public function update(Request $request, Post $post_id)
     {
         $credentials = $request->only('title', 'content', 'categories');
 
@@ -79,25 +79,25 @@ class PostController extends Controller
         }
 
         if ($title) {
-            $post->title = $title;
+            $post_id->title = $title;
         }
         if ($content) {
-            $post->content = $content;
+            $post_id->content = $content;
         }
         if ($categories) {
-            $post->categories = $categories;
+            $post_id->categories = $categories;
         }
 
-        $post->save();
+        $post_id->save();
 
         return response()->json([
             'message' => 'Post updated.'
         ], Response::HTTP_OK);
     }
 
-    public function delete(Post $post)
+    public function delete(Post $post_id)
     {
-        $post->delete();
+        $post_id->delete();
 
         return response()->json([
             'message' => 'Post removed.'

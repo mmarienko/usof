@@ -15,7 +15,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         // Remove exists records to start from scratch.
-        //User::truncate();
+        User::truncate();
 
         $faker = \Faker\Factory::create();
 
@@ -24,7 +24,7 @@ class UsersTableSeeder extends Seeder
         User::create([
             'login' => 'admin',
             'password' => $password,
-            'full name' => 'Marienko Maksym',
+            'full_name' => 'Marienko Maksym',
             'email' => 'zmaryenko@gmail.com',
             'rating' => '99',
             'role' => 'admin',
@@ -35,7 +35,7 @@ class UsersTableSeeder extends Seeder
             User::create([
                 'login' => $faker->userName,
                 'password' => $password,
-                'full name' => $faker->name,
+                'full_name' => $faker->name,
                 'email' => $faker->email,
                 'rating' => $faker->biasedNumberBetween(-100, 100),
             ]);

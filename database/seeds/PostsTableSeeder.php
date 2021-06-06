@@ -13,7 +13,7 @@ class PostsTableSeeder extends Seeder
     public function run()
     {
         // Remove exists records to start from scratch.
-        //Post::truncate();
+        Post::truncate();
 
         $faker = \Faker\Factory::create();
 
@@ -21,7 +21,7 @@ class PostsTableSeeder extends Seeder
             Post::create([
                 'author' => $faker->name,
                 'title' => $faker->sentence,
-                'publish date' => $faker->date(),
+                'publish_date' => $faker->date(),
                 'status' => $faker->randomElement(['active', 'inactive']),
                 'content' => $faker->paragraph,
                 'categories' => $faker->randomElement(['C++', 'Python', 'JavaScript', 'PHP'])

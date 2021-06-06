@@ -78,9 +78,9 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function verify($verification_code)
+    public function verify($confirm_token)
     {
-        $check = DB::table('user_verifications')->where('token', $verification_code)->first();
+        $check = DB::table('user_verifications')->where('token', $confirm_token)->first();
 
         if (is_null($check)) {
             return response()->json([
@@ -224,7 +224,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function recover(Request $request, $recovery_code)
+    public function recover(Request $request, $confirm_token)
     {
         $credentials = $request->only('new-password');
 
@@ -238,7 +238,7 @@ class AuthController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $check = DB::table('password_resets')->where('token', $recovery_code)->first();
+        $check = DB::table('password_resets')->where('token', $confirm_token)->first();
 
         if (is_null($check)) {
             return response()->json([
@@ -255,15 +255,5 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'You have successfully recover your password.'
         ], Response::HTTP_OK);
-    }
-
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function me()
-    {
-        return response()->json(auth()->user());
     }
 }

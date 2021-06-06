@@ -17,10 +17,10 @@ class CreatePostsTable extends Migration
             $table->bigIncrements('id');
             $table->string('author')->default('guest');
             $table->string('title');
-            $table->string('publish date')->default('2001-09-04');
+            $table->timestamp('publish_date')->useCurrent();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->text('content');
-            $table->string('categories')->nullable();
+            $table->string('categories')->default('[]');
             $table->timestamps();
         });
     }
