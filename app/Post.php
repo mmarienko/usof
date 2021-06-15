@@ -12,6 +12,14 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'author', 'title', 'publish date', 'status', 'content', 'categories'
+        'author', 'title', 'publish_date', 'status', 'content', 'categories'
     ];
+
+    /**
+     * The category that belong to the post.
+     */
+    public function categories()
+    {
+        return $this->belongsToMany('App\Tag');
+    }
 }

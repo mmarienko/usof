@@ -15,16 +15,33 @@ use App\User;
 
 class UserController extends Controller
 {
+    /**
+     * Display a listing of the users.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         return User::all();
     }
 
+     /**
+     * Display the user.
+     *
+     * @param  User  $user_id
+     * @return \Illuminate\Http\Response
+     */
     public function show(User $user_id)
     {
         return $user_id;
     }
 
+     /**
+     * Store a newly created user in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         $credentials = $request->only('login', 'password', 'password_confirmation', 'email', 'role');
@@ -76,6 +93,11 @@ class UserController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * Upload avatar the user in storage.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function avatar(Request $request)
     {
         if (!$request->hasFile('avatar')) {
@@ -98,7 +120,7 @@ class UserController extends Controller
 
         $avatar = $request->file('avatar');
 
-        $path = public_path() . '/uploads/images/store/';
+        $path = public_path() . '/uploads/images/avatars';
         $avatar->move($path, $avatar->getClientOriginalName());
 
         return response()->json([
@@ -106,6 +128,13 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Update the user in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  User  $user_id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, User $user_id)
     {
         $credentials = $request->only('login', 'full_name', 'profile_picture');
@@ -149,6 +178,12 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Remove the user from storage.
+     *
+     * @param  User  $user_id
+     * @return \Illuminate\Http\Response
+     */
     public function delete(User $user_id)
     {
         $user_id->delete();

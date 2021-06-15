@@ -2,38 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Validator;
+use App\Comment;
 
-use App\Post;
-
-class PostController extends Controller
+class CommentController extends Controller
 {
     /**
-     * Display a listing of the posts.
+     * Display a listing of the comments.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return Post::paginate(5);
+        return Comment::All();
     }
 
      /**
-     * Display the post.
+     * Display the comment.
      *
-     * @param  Post  $post_id
+     * @param  Comment  $comment_id
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post_id)
+    public function show(Comment $comment_id)
     {
-        return $post_id;
+        return $comment_id;
     }
 
     /**
-     * Store a newly created post in storage.
+     * Store a newly created comment in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -58,25 +56,25 @@ class PostController extends Controller
         $content = $request->content;
         $categories = $request->categories;
 
-        Post::create([
+        Comment::create([
             'title' => $title,
             'content' => $content,
             'categories' => $categories,
         ]);
 
         return response()->json([
-            'message' => 'Post created.'
+            'message' => 'Comment created'
         ], Response::HTTP_CREATED);
     }
 
     /**
-     * Update the post in storage.
+     * Update the comment in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  Post  $post_id
+     * @param  Comment  $comment_id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post_id)
+    public function update(Request $request, Comment $comment_id)
     {
         $credentials = $request->only('title', 'content', 'categories');
 
@@ -98,39 +96,39 @@ class PostController extends Controller
 
         if (!$title && !$content && !$categories) {
             return response()->json([
-                'message' => 'Http bad request.'
+                'message' => 'Http bad request'
             ], Response::HTTP_BAD_REQUEST);
         }
 
         if ($title) {
-            $post_id->title = $title;
+            $comment_id->title = $title;
         }
         if ($content) {
-            $post_id->content = $content;
+            $comment_id->content = $content;
         }
         if ($categories) {
-            $post_id->categories = $categories;
+            $comment_id->categories = $categories;
         }
 
-        $post_id->save();
+        $comment_id->save();
 
         return response()->json([
-            'message' => 'Post updated.'
+            'message' => 'Comment updated'
         ], Response::HTTP_OK);
     }
 
     /**
-     * Remove the post from storage.
+     * Remove the comment from storage.
      *
-     * @param  Post  $post_id
+     * @param  Comment  $comment_id
      * @return \Illuminate\Http\Response
      */
-    public function delete(Post $post_id)
+    public function delete(Comment $comment_id)
     {
-        $post_id->delete();
+        $comment_id->delete();
 
         return response()->json([
-            'message' => 'Post removed'
+            'message' => 'Comment removed'
         ], Response::HTTP_OK);
     }
 }

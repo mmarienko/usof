@@ -2,38 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Validator;
+use App\Category;
 
-use App\Post;
-
-class PostController extends Controller
+class CategoryController extends Controller
 {
     /**
-     * Display a listing of the posts.
+     * Display a listing of the categories.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return Post::paginate(5);
+        return Category::All();
     }
 
      /**
-     * Display the post.
+     * Display the category.
      *
-     * @param  Post  $post_id
+     * @param  Category  $category_id
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post_id)
+    public function show(Category $category_id)
     {
-        return $post_id;
+        return $category_id;
     }
 
     /**
-     * Store a newly created post in storage.
+     * Store a newly created category in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -58,25 +56,25 @@ class PostController extends Controller
         $content = $request->content;
         $categories = $request->categories;
 
-        Post::create([
+        Category::create([
             'title' => $title,
             'content' => $content,
             'categories' => $categories,
         ]);
 
         return response()->json([
-            'message' => 'Post created.'
+            'message' => 'Category created'
         ], Response::HTTP_CREATED);
     }
 
     /**
-     * Update the post in storage.
+     * Update the category in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  Post  $post_id
+     * @param  Category  $category_id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post_id)
+    public function update(Request $request, Category $category_id)
     {
         $credentials = $request->only('title', 'content', 'categories');
 
@@ -98,39 +96,39 @@ class PostController extends Controller
 
         if (!$title && !$content && !$categories) {
             return response()->json([
-                'message' => 'Http bad request.'
+                'message' => 'Http bad request'
             ], Response::HTTP_BAD_REQUEST);
         }
 
         if ($title) {
-            $post_id->title = $title;
+            $category_id->title = $title;
         }
         if ($content) {
-            $post_id->content = $content;
+            $category_id->content = $content;
         }
         if ($categories) {
-            $post_id->categories = $categories;
+            $category_id->categories = $categories;
         }
 
-        $post_id->save();
+        $category_id->save();
 
         return response()->json([
-            'message' => 'Post updated.'
+            'message' => 'Category updated'
         ], Response::HTTP_OK);
     }
 
     /**
-     * Remove the post from storage.
+     * Remove the category from storage.
      *
-     * @param  Post  $post_id
+     * @param  Category  $category_id
      * @return \Illuminate\Http\Response
      */
-    public function delete(Post $post_id)
+    public function delete(Category $category_id)
     {
-        $post_id->delete();
+        $category_id->delete();
 
         return response()->json([
-            'message' => 'Post removed'
+            'message' => 'Category removed'
         ], Response::HTTP_OK);
     }
 }
