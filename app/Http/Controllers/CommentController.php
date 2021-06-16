@@ -10,16 +10,6 @@ use App\Comment;
 class CommentController extends Controller
 {
     /**
-     * Display a listing of the comments.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        return Comment::All();
-    }
-
-     /**
      * Display the comment.
      *
      * @param  Comment  $comment_id
@@ -31,19 +21,29 @@ class CommentController extends Controller
     }
 
     /**
-     * Store a newly created comment in storage.
+     * Display the post likes.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Comment  $comment_id
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function likes(Comment $comment_id)
     {
-        $credentials = $request->only('title', 'content', 'categories');
+        return $comment_id->likes;
+    }
+
+    /**
+     * Store a newly created like of comment in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  Comment  $comment_id
+     * @return \Illuminate\Http\Response
+     */
+    public function like(Comment $comment_id, Request $request)
+    {
+        $credentials = $request->only('type');
 
         $validator = Validator::make($credentials, [
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-            'categories' => ['required', 'string']
+            'type' => ['required', 'string', 'in:like,dislike']
         ]);
 
         if ($validator->fails()) {
@@ -52,18 +52,14 @@ class CommentController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $title = $request->title;
-        $content = $request->content;
-        $categories = $request->categories;
-
-        Comment::create([
-            'title' => $title,
-            'content' => $content,
-            'categories' => $categories,
+        $comment_id->likes()->create([
+            'author' => auth()->user()->full_name,
+            'type' => $request->type,
         ]);
 
+
         return response()->json([
-            'message' => 'Comment created'
+            'message' => 'Like created'
         ], Response::HTTP_CREATED);
     }
 
@@ -76,12 +72,10 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment_id)
     {
-        $credentials = $request->only('title', 'content', 'categories');
+        $credentials = $request->only('content');
 
         $validator = Validator::make($credentials, [
-            'title' => ['string', 'max:255'],
-            'content' => ['string'],
-            'categories' => ['string']
+            'content' => ['required', 'string'],
         ]);
 
         if ($validator->fails()) {
@@ -90,27 +84,9 @@ class CommentController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $title = $request->title;
-        $content = $request->content;
-        $categories = $request->categories;
-
-        if (!$title && !$content && !$categories) {
-            return response()->json([
-                'message' => 'Http bad request'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($title) {
-            $comment_id->title = $title;
-        }
-        if ($content) {
-            $comment_id->content = $content;
-        }
-        if ($categories) {
-            $comment_id->categories = $categories;
-        }
-
-        $comment_id->save();
+        $comment_id->update([
+            'content' => $request->content,
+        ]);
 
         return response()->json([
             'message' => 'Comment updated'
@@ -125,10 +101,26 @@ class CommentController extends Controller
      */
     public function delete(Comment $comment_id)
     {
+        $comment_id->likes()->delete();
         $comment_id->delete();
 
         return response()->json([
             'message' => 'Comment removed'
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Remove the likes of post from storage.
+     *
+     * @param  Post  $comment_id
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteLike(Comment $comment_id)
+    {
+        $comment_id->likes()->delete();
+
+        return response()->json([
+            'message' => 'Likes removed'
         ], Response::HTTP_OK);
     }
 }

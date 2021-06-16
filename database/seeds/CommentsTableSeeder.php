@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Post;
+use App\Comment;
 
-class PostsTableSeeder extends Seeder
+class CommentsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,20 +13,17 @@ class PostsTableSeeder extends Seeder
     public function run()
     {
         // Remove exists records to start from scratch.
-        Post::truncate();
+        Comment::truncate();
 
         $faker = \Faker\Factory::create();
 
-        for ($i = 0; $i < 10; $i++) {
-            $post = Post::create([
+        for ($i = 0; $i < 20; $i++) {
+            Comment::create([
                 'author' => $faker->name,
-                'title' => $faker->sentence,
                 'publish_date' => $faker->date(),
-                'status' => $faker->randomElement(['active', 'inactive']),
                 'content' => $faker->paragraph,
+                'post_id' => $faker->numberBetween(1, 10),
             ]);
-
-            $post->categories()->attach($faker->randomElements(['1', '2', '3', '4']));
         }
     }
 }

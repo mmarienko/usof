@@ -102,7 +102,7 @@ class UserController extends Controller
     {
         if (!$request->hasFile('avatar')) {
             return response()->json([
-                'message' => 'File not found.'
+                'message' => 'File not found'
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -124,7 +124,7 @@ class UserController extends Controller
         $avatar->move($path, $avatar->getClientOriginalName());
 
         return response()->json([
-            'message' => 'Avatar upload.'
+            'message' => 'Avatar upload'
         ], Response::HTTP_OK);
     }
 
@@ -157,7 +157,7 @@ class UserController extends Controller
 
         if (!$login && !$full_name && !$profile_picture) {
             return response()->json([
-                'message' => 'Http bad request.'
+                'message' => 'Http bad request'
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -174,7 +174,7 @@ class UserController extends Controller
         $user_id->save();
 
         return response()->json([
-            'message' => 'User updated.'
+            'message' => 'User updated'
         ], Response::HTTP_OK);
     }
 
@@ -189,7 +189,7 @@ class UserController extends Controller
         $user_id->delete();
 
         return response()->json([
-            'message' => 'User removed.'
+            'message' => 'User removed'
         ], Response::HTTP_OK);
     }
 }

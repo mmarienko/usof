@@ -15,12 +15,11 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('author')->default('guest');
+            $table->string('author');
             $table->string('title');
             $table->timestamp('publish_date')->useCurrent();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->text('content');
-            $table->string('categories')->nullable();
             $table->timestamps();
         });
     }

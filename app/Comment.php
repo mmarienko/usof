@@ -14,4 +14,12 @@ class Comment extends Model
     protected $fillable = [
         'author', 'publish_date', 'content'
     ];
+
+    /**
+     * The likes that belong to the comment.
+     */
+    public function likes()
+    {
+        return $this->hasMany('App\Like');
+    }
 }

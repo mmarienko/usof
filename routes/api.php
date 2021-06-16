@@ -18,46 +18,64 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', 'AuthController@register');
     Route::post('login', 'AuthController@login');
 
-    Route::middleware('jwt.auth')->post('logout', 'AuthController@logout');
     Route::middleware('jwt.auth')->post('password-reset', 'AuthController@reset');
     Route::middleware('jwt.auth')->post('refresh', 'AuthController@refresh');
 
     Route::post('password-reset/{confirm_token}', 'AuthController@recover');
     Route::get('verify/{confirm_token}', 'AuthController@verify');
+
+    Route::middleware('jwt.auth')->post('logout', 'AuthController@logout');
 });
 
-Route::group([], function() {
-    Route::get('users', 'UserController@index');
-    Route::get('users/{user_id}', 'UserController@show');
-    Route::middleware('jwt.auth')->post('users', 'UserController@store');
-    Route::middleware('jwt.auth')->post('users/avatar', 'UserController@avatar');
-    Route::middleware('jwt.auth')->patch('users/{user_id}', 'UserController@update');
-    Route::middleware('jwt.auth')->delete('users/{user_id}', 'UserController@delete');
+Route::group(['prefix' => 'users', 'middleware' => 'jwt.auth'], function () {
+    Route::get('/', 'UserController@index');
+    Route::post('/', 'UserController@store');
+
+    Route::get('{user_id}', 'UserController@show');
+    Route::patch('{user_id}', 'UserController@update');
+    Route::delete('{user_id}', 'UserController@delete');
+
+    Route::post('avatar', 'UserController@avatar');
 });
 
-Route::group([], function() {
-    Route::get('posts', 'PostController@index');
-    Route::get('posts/{post_id}', 'PostController@show');
 
-    Route::middleware('jwt.auth')->post('posts', 'PostController@store');
-    Route::middleware('jwt.auth')->patch('posts/{post}', 'PostController@update');
-    Route::middleware('jwt.auth')->delete('posts/{post}', 'PostController@delete');
+
+Route::group(['prefix' => 'posts'], function () {
+    Route::get('/', 'PostController@index');
+    Route::get('{post_id}', 'PostController@show');
+    Route::get('{post_id}/comments', 'PostController@comments');
+
+    Route::group(['middleware' => 'jwt.auth'], function () {
+        Route::post('/', 'PostController@store');
+
+        Route::patch('{post_id}', 'PostController@update');
+        Route::delete('{post_id}', 'PostController@delete');
+
+        Route::post('{post_id}/comments', 'PostController@comment');
+        Route::get('{post_id}/categories', 'PostController@categories');
+        Route::get('{post_id}/like', 'PostController@likes');
+        Route::post('{post_id}/like', 'PostController@like');
+        Route::delete('{post_id}/like', 'PostController@deleteLike');
+    });
 });
 
-Route::group([], function() {
-    Route::get('categories', 'CategoryController@index');
-    Route::get('categories/{category_id}', 'CategoryController@show');
+Route::group(['prefix' => 'categories', 'middleware' => 'jwt.auth'], function () {
+    Route::get('/', 'CategoryController@index');
+    Route::post('/', 'CategoryController@store');
 
-    Route::middleware('jwt.auth')->post('categories', 'CategoryController@store');
-    Route::middleware('jwt.auth')->patch('categories/{category_id}', 'CategoryController@update');
-    Route::middleware('jwt.auth')->delete('categories/{category_id}', 'CategoryController@delete');
+    Route::get('{category_id}', 'CategoryController@show');
+    Route::patch('{category_id}', 'CategoryController@update');
+    Route::delete('{category_id}', 'CategoryController@delete');
+
+    Route::get('{category_id}/posts', 'CategoryController@posts');
 });
 
-Route::group([], function() {
-    Route::get('comments', 'CommentController@index');
-    Route::get('comments/{comment_id}', 'CommentController@show');
+Route::group(['prefix' => 'comments', 'middleware' => 'jwt.auth'], function () {
+    Route::get('{comment_id}', 'CommentController@show');
+    Route::patch('{comment_id}', 'CommentController@update');
+    Route::delete('{comment_id}', 'CommentController@delete');
 
-    Route::middleware('jwt.auth')->post('comments', 'CommentController@store');
-    Route::middleware('jwt.auth')->patch('comments/{comment_id}', 'CommentController@update');
-    Route::middleware('jwt.auth')->delete('comments/{comment_id}', 'CommentController@delete');
+    Route::get('{comment_id}/like', 'CommentController@likes');
+    Route::post('{comment_id}/like', 'CommentController@like');
+    Route::delete('{comment_id}/like', 'CommentController@deleteLike');
 });

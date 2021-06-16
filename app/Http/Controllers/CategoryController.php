@@ -19,7 +19,7 @@ class CategoryController extends Controller
         return Category::All();
     }
 
-     /**
+    /**
      * Display the category.
      *
      * @param  Category  $category_id
@@ -31,6 +31,17 @@ class CategoryController extends Controller
     }
 
     /**
+     * Display the post categories.
+     *
+     * @param  Category  $category_id
+     * @return \Illuminate\Http\Response
+     */
+    public function posts(Category $category_id)
+    {
+        return $category_id->posts;
+    }
+
+    /**
      * Store a newly created category in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -38,12 +49,11 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $credentials = $request->only('title', 'content', 'categories');
+        $credentials = $request->only('title', 'content');
 
         $validator = Validator::make($credentials, [
             'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-            'categories' => ['required', 'string']
+            'content' => ['string'],
         ]);
 
         if ($validator->fails()) {
@@ -52,14 +62,9 @@ class CategoryController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $title = $request->title;
-        $content = $request->content;
-        $categories = $request->categories;
-
         Category::create([
-            'title' => $title,
-            'content' => $content,
-            'categories' => $categories,
+            'title' => $request->title,
+            'content' => $request->content,
         ]);
 
         return response()->json([
@@ -76,12 +81,11 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category_id)
     {
-        $credentials = $request->only('title', 'content', 'categories');
+        $credentials = $request->only('title', 'content');
 
         $validator = Validator::make($credentials, [
             'title' => ['string', 'max:255'],
             'content' => ['string'],
-            'categories' => ['string']
         ]);
 
         if ($validator->fails()) {
@@ -90,27 +94,10 @@ class CategoryController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $title = $request->title;
-        $content = $request->content;
-        $categories = $request->categories;
-
-        if (!$title && !$content && !$categories) {
-            return response()->json([
-                'message' => 'Http bad request'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($title) {
-            $category_id->title = $title;
-        }
-        if ($content) {
-            $category_id->content = $content;
-        }
-        if ($categories) {
-            $category_id->categories = $categories;
-        }
-
-        $category_id->save();
+        $category_id->update([
+            'title' => $request->title,
+            'content' => $request->content,
+        ]);
 
         return response()->json([
             'message' => 'Category updated'
@@ -125,6 +112,7 @@ class CategoryController extends Controller
      */
     public function delete(Category $category_id)
     {
+        $category_id->posts()->detach();
         $category_id->delete();
 
         return response()->json([

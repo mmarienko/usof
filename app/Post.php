@@ -16,10 +16,26 @@ class Post extends Model
     ];
 
     /**
-     * The category that belong to the post.
+     * The categories that belong to the post.
      */
     public function categories()
     {
-        return $this->belongsToMany('App\Tag');
+        return $this->belongsToMany('App\Category');
+    }
+
+    /**
+     * The comments that belong to the post.
+     */
+    public function comments()
+    {
+        return $this->hasMany('App\Comment');
+    }
+
+    /**
+     * The likes that belong to the post.
+     */
+    public function likes()
+    {
+        return $this->hasMany('App\Like');
     }
 }

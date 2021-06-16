@@ -17,8 +17,10 @@ class CreateLikesTable extends Migration
             $table->bigIncrements('id');
             $table->string('author');
             $table->timestamp('publish_date')->useCurrent();
-            $table->unsignedBigInteger('post_id')->unsigned();
-            $table->unsignedBigInteger('comment_id')->unsigned();
+            $table->unsignedBigInteger('post_id')->unsigned()->nullable();
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->unsignedBigInteger('comment_id')->unsigned()->nullable();
+            $table->foreign('comment_id')->references('id')->on('comments')->onDelete('cascade');
             $table->enum('type', ['like', 'dislike']);
             $table->timestamps();
         });
