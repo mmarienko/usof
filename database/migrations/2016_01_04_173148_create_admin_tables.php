@@ -21,7 +21,7 @@ class CreateAdminTables extends Migration
      */
     public function up()
     {
-        Schema::create(config('admin.database.users_table'), function (Blueprint $table) {
+        /*Schema::create(config('admin.database.users_table'), function (Blueprint $table) {
             $table->increments('id');
             $table->string('username', 190)->unique();
             $table->string('password', 60);
@@ -96,7 +96,7 @@ class CreateAdminTables extends Migration
             $table->text('input');
             $table->index('user_id');
             $table->timestamps();
-        });
+        });*/
     }
 
     /**

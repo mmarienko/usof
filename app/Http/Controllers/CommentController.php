@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Comment;
+use App\Like;
 
 class CommentController extends Controller
 {
@@ -40,6 +41,14 @@ class CommentController extends Controller
      */
     public function like(Comment $comment_id, Request $request)
     {
+        $query = Like::where('comment_id', '=', $comment_id->id)->where('author', '=', auth()->user()->login)->first();
+
+        if ($query) {
+            return response()->json([
+                'message' => 'Like already'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $credentials = $request->only('type');
 
         $validator = Validator::make($credentials, [
@@ -53,10 +62,9 @@ class CommentController extends Controller
         }
 
         $comment_id->likes()->create([
-            'author' => auth()->user()->full_name,
+            'author' => auth()->user()->login,
             'type' => $request->type,
         ]);
-
 
         return response()->json([
             'message' => 'Like created'
@@ -72,6 +80,12 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment_id)
     {
+        if (auth()->user()->login != $comment_id->author) {
+            return response()->json([
+                'message' => 'Comment not avaible'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $credentials = $request->only('content');
 
         $validator = Validator::make($credentials, [
@@ -101,6 +115,12 @@ class CommentController extends Controller
      */
     public function delete(Comment $comment_id)
     {
+        if (auth()->user()->role != 'admin' || auth()->user()->login != $comment_id->author) {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $comment_id->likes()->delete();
         $comment_id->delete();
 
@@ -117,10 +137,18 @@ class CommentController extends Controller
      */
     public function deleteLike(Comment $comment_id)
     {
-        $comment_id->likes()->delete();
+        $query = Like::where('comment_id', '=', $comment_id->id)->where('author', '=', auth()->user()->login)->first();
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $query->delete();
 
         return response()->json([
-            'message' => 'Likes removed'
+            'message' => 'Like removed'
         ], Response::HTTP_OK);
     }
 }

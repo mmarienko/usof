@@ -44,6 +44,12 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'admin') {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $credentials = $request->only('login', 'password', 'password_confirmation', 'email', 'role');
 
         $validator = Validator::make($credentials, [
@@ -137,6 +143,12 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user_id)
     {
+        if (auth()->user()->role != 'admin') {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $credentials = $request->only('login', 'full_name', 'profile_picture');
 
         $validator = Validator::make($credentials, [
@@ -186,6 +198,12 @@ class UserController extends Controller
      */
     public function delete(User $user_id)
     {
+        if (auth()->user()->role != 'admin') {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $user_id->delete();
 
         return response()->json([

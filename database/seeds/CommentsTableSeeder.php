@@ -19,7 +19,7 @@ class CommentsTableSeeder extends Seeder
 
         for ($i = 0; $i < 20; $i++) {
             Comment::create([
-                'author' => $faker->name,
+                'author' => $faker->userName,
                 'publish_date' => $faker->date(),
                 'content' => $faker->paragraph,
                 'post_id' => $faker->numberBetween(1, 10),

@@ -49,6 +49,12 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'admin') {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $credentials = $request->only('title', 'content');
 
         $validator = Validator::make($credentials, [
@@ -81,6 +87,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category_id)
     {
+        if (auth()->user()->role != 'admin') {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $credentials = $request->only('title', 'content');
 
         $validator = Validator::make($credentials, [
@@ -112,6 +124,12 @@ class CategoryController extends Controller
      */
     public function delete(Category $category_id)
     {
+        if (auth()->user()->role != 'admin') {
+            return response()->json([
+                'message' => 'Not work'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $category_id->posts()->detach();
         $category_id->delete();
 

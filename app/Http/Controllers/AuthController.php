@@ -127,10 +127,17 @@ class AuthController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+        $user = User::where('login', $request->login)->first();
+
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'message' => 'We cant find an account with this credentials.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            if (!$user->email_verified_at) {
+                return response()->json([
+                    'message' => 'You have verified your email address.'
                 ], Response::HTTP_NOT_FOUND);
             }
         } catch (JWTException $e) {

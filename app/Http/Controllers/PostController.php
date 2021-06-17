@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use App\Post;
+use App\Like;
 
 class PostController extends Controller
 {
@@ -19,10 +20,14 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $credentials = $request->only('sortby', 'filter');
+        $credentials = $request->only('sortby', 'categories', 'status', 'from_date', 'to_date');
 
         $validator = Validator::make($credentials, [
             'sortby' => ['string', 'max:255', 'in:ASC,DESC'],
+            'categories' => ['string', 'max:255'],
+            'status' => ['string', 'max:255', 'in:active,inactive'],
+            'from_date' => ['date', 'before:to_date', 'date_format:Y-m-d'],
+            'to_date' => ['date', 'after:from_date', 'date_format:Y-m-d'],
         ]);
 
         if ($validator->fails()) {
@@ -31,16 +36,44 @@ class PostController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         };
 
+        $query = Post::limit(10);
+
+        $query->where('status', 'active');
+
+        if ($request->user()) {
+            $query->orWhere('author', auth()->user()->login);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('publish_date','>=', $request->get('from_date'));
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('publish_date','<=', $request->get('to_date'));
+        }
+
+        if ($request->filled('categories')) {
+            $query->whereHas('categories', function($q) use ($request) {
+                $q->where('category_id', '=', $request->get('categories'));
+            });
+        }
+
         switch ($request->sortby) {
             case 'ASC':
-                return Post::orderBy('created_at')->paginate(10);
+                $query->orderBy('created_at');
                 break;
             case 'DESC':
-                return Post::orderByDesc('created_at')->paginate(10);
+                $query->orderByDesc('created_at');
                 break;
             default:
-                return Post::withCount('likes')->orderByDesc('likes_count')->paginate(10);
+                $query->withCount('likes')->orderByDesc('likes_count');
         }
+
+        return $query->with('categories')->paginate(10);
     }
 
     /**
@@ -110,7 +143,7 @@ class PostController extends Controller
         };
 
         $post_id = Post::create([
-            'author' => auth()->user()->full_name,
+            'author' => auth()->user()->login,
             'title' => $request->title,
             'content' => $request->content,
         ]);
@@ -163,6 +196,14 @@ class PostController extends Controller
      */
     public function like(Post $post_id, Request $request)
     {
+        $query = Like::where('post_id', '=', $post_id->id)->where('author', '=', auth()->user()->login)->first();
+
+        if ($query) {
+            return response()->json([
+                'message' => 'Like already'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $credentials = $request->only('type');
 
         $validator = Validator::make($credentials, [
@@ -176,7 +217,7 @@ class PostController extends Controller
         }
 
         $post_id->likes()->create([
-            'author' => auth()->user()->full_name,
+            'author' => auth()->user()->login,
             'type' => $request->type,
         ]);
 
@@ -195,6 +236,12 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post_id)
     {
+        if (auth()->user()->login != $post_id->author) {
+            return response()->json([
+                'message' => 'Post not avaible'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $credentials = $request->only('title', 'content', 'categories');
 
         $validator = Validator::make($credentials, [
@@ -231,6 +278,12 @@ class PostController extends Controller
      */
     public function delete(Post $post_id)
     {
+        if (auth()->user()->login != $post_id->author) {
+            return response()->json([
+                'message' => 'Post not avaible'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $post_id->categories()->detach();
         $post_id->comments()->delete();
         $post_id->likes()->delete();
@@ -249,10 +302,18 @@ class PostController extends Controller
      */
     public function deleteLike(Post $post_id)
     {
-        $post_id->likes()->delete();
+        $query = Like::where('post_id', '=', $post_id->id)->where('author', '=', auth()->user()->login)->first();
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $query->delete();
 
         return response()->json([
-            'message' => 'Likes removed'
+            'message' => 'Like removed'
         ], Response::HTTP_OK);
     }
 }
