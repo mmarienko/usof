@@ -1,8 +1,28 @@
-// Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import "variables";
+@import "reset";
 
-// Variables
-@import 'variables';
+body {
+    font-family: 'Roboto', sans-serif;
+}
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #212121;
+    color: #fff;
+}
+
+.main {
+    flex: 1 0 auto;
+    margin-top: 112px;
+
+    @media (max-width: 575.98px) {
+        margin-top: 104px;
+    }
+}
+
+.header,
+.footer {
+    flex-shrink: 0;
+}
